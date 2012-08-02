@@ -1,29 +1,52 @@
 package com.example.mex;
 
 import android.app.ListFragment;
-import android.content.ContentResolver;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.provider.ContactsContract.Contacts;
 import android.widget.SimpleCursorAdapter;
 
-public class ContactFragment extends ListFragment {
+public class ContactFragment extends ListFragment implements LoaderCallbacks<Cursor> {
 
 	SimpleCursorAdapter adapter;
-	static final String[] COLUMNS = new String[] {ContactsContract.Data.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER};
-	static final String SELECTION = "((" + ContactsContract.Data.DISPLAY_NAME + " NOTNULL) AND (" + ContactsContract.Data.DISPLAY_NAME + " != '' ))";
+	String[] PROJECTION = { Contacts._ID,
+	        Contacts.DISPLAY_NAME,
+	        Contacts.CONTACT_STATUS,
+	        Contacts.CONTACT_PRESENCE,
+	        Contacts.PHOTO_ID,
+	        Contacts.LOOKUP_KEY, };
+	String sort = ContactsContract.Contacts.DISPLAY_NAME + "COLLATE LOCALIZED ASC";
+	String[] COLUMNS = new String[] {Contacts.DISPLAY_NAME, Contacts.CONTACT_STATUS};
+	String SELECTION = "((" + Contacts.DISPLAY_NAME + " NOTNULL) AND ("
+                + Contacts.HAS_PHONE_NUMBER + "=1) AND ("
+                + Contacts.DISPLAY_NAME + " != '' ))";
 	static final String[] values = {"HELLO", "MENTE", "JOAN", "TALYA"};
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, values);
+		adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_expandable_list_item_1, null, COLUMNS , new int[] {android.R.id.text1, android.R.id.text2}, 0);
 		setListAdapter(adapter);
+		
+		getLoaderManager().initLoader(0, null, this);
+	}
+	
+	public Loader<Cursor> onCreateLoader( int id, Bundle args ) {
+		
+		return new CursorLoader(getActivity(), ContactsContract.Contacts.CONTENT_URI, PROJECTION, SELECTION, null, sort);
+	}
+	
+	public void onLoadFinished( Loader<Cursor> loader, Cursor cursor) {
+		adapter.swapCursor( cursor );
+	}
+	
+	public void onLoaderReset( Loader<Cursor> loader) {
+		adapter.swapCursor( null );
 	}
 	
 	/*@Override
