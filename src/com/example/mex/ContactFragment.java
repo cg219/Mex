@@ -5,32 +5,37 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.Contacts;
+import android.util.Log;
 import android.widget.SimpleCursorAdapter;
 
 public class ContactFragment extends ListFragment implements LoaderCallbacks<Cursor> {
 
 	SimpleCursorAdapter adapter;
-	String[] PROJECTION = { Contacts._ID,
-	        Contacts.DISPLAY_NAME,
-	        Contacts.CONTACT_STATUS,
-	        Contacts.CONTACT_PRESENCE,
-	        Contacts.PHOTO_ID,
-	        Contacts.LOOKUP_KEY, };
-	String sort = ContactsContract.Contacts.DISPLAY_NAME + "COLLATE LOCALIZED ASC";
-	String[] COLUMNS = new String[] {Contacts.DISPLAY_NAME, Contacts.CONTACT_STATUS};
-	String SELECTION = "((" + Contacts.DISPLAY_NAME + " NOTNULL) AND ("
-                + Contacts.HAS_PHONE_NUMBER + "=1) AND ("
-                + Contacts.DISPLAY_NAME + " != '' ))";
+	//Uri URI = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, ContactsContract.Contacts.Entity.CONTENT_DIRECTORY);
+	Uri URI = ContactsContract.Contacts.CONTENT_URI;
+	String[] PROJECTION = { ContactsContract.Contacts.Entity._ID,
+			ContactsContract.Contacts.Entity.DISPLAY_NAME_PRIMARY,
+			ContactsContract.Contacts.Entity.TIMES_CONTACTED ,
+			ContactsContract.Contacts.Entity.HAS_PHONE_NUMBER ,
+			ContactsContract.Contacts.Entity.DATA1 };
+	String sort = ContactsContract.Contacts.Entity.DISPLAY_NAME_PRIMARY + " ASC";
+	String[] COLUMNS = new String[] {ContactsContract.Contacts.Entity.DISPLAY_NAME_PRIMARY, ContactsContract.Contacts.Entity.DATA1};
+	String SELECTION = "((" + ContactsContract.Contacts.Entity.DISPLAY_NAME_PRIMARY + " NOTNULL)  AND ("
+                + ContactsContract.Contacts.Entity.HAS_PHONE_NUMBER + " != 0 ))";
+	/*String SELECTION = "((" + ContactsContract.CommonDataKinds.Phone.NUMBER + " NOTNULL)  AND ("
+                + ContactsContract.CommonDataKinds.Phone.NUMBER + " != '' ))";*/
+	
+	
 	static final String[] values = {"HELLO", "MENTE", "JOAN", "TALYA"};
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
-		adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_expandable_list_item_1, null, COLUMNS , new int[] {android.R.id.text1, android.R.id.text2}, 0);
+		adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_expandable_list_item_2, null, COLUMNS , new int[] {android.R.id.text1, android.R.id.text2}, 0);
 		setListAdapter(adapter);
 		
 		getLoaderManager().initLoader(0, null, this);
@@ -38,11 +43,12 @@ public class ContactFragment extends ListFragment implements LoaderCallbacks<Cur
 	
 	public Loader<Cursor> onCreateLoader( int id, Bundle args ) {
 		
-		return new CursorLoader(getActivity(), ContactsContract.Contacts.CONTENT_URI, PROJECTION, SELECTION, null, sort);
+		return new CursorLoader(getActivity(), URI, PROJECTION, SELECTION, null, sort);
 	}
 	
 	public void onLoadFinished( Loader<Cursor> loader, Cursor cursor) {
 		adapter.swapCursor( cursor );
+		Log.v("HA",  "MORE HA");
 	}
 	
 	public void onLoaderReset( Loader<Cursor> loader) {
