@@ -1,0 +1,24 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/displayName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:height="50sp"
+        android:maxLines="1"
+        android:minHeight="50sp"
+        android:textColor="@android:color/black"
+        android:textSize="36sp"
+        tools:context=".ContactDetailsFragment" />
+
+    <ListView
+        android:id="@+id/numberList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
+
+</LinearLayout>
